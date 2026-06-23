@@ -4,62 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>99 Имен Аллаха</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Подключаем нужные шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2 family=Amiri:ital@0;1&family=Nunito:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300..900&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Основной приоритет отдаем Nunito для максимальной читаемости */
-        body { font-family: 'Nunito', 'Inter', sans-serif; background-color: #fdfbf7; }
-        .arabic-text { font-family: 'Amiri', serif; }
-        
-        /* Плавное каскадное появление */
+        body { font-family: 'Nunito Sans', sans-serif; background-color: #f9f9f6; font-size: 0.85rem; }
+        .arabic-text { font-family: 'Scheherazade New', serif; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-card { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-card { animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="text-stone-850 dark:bg-[#111311] dark:text-stone-200 min-h-screen flex flex-col transition-colors duration-300">
+<body class="text-stone-800 dark:bg-[#0d0e0d] dark:text-stone-300 min-h-screen flex flex-col transition-colors duration-200">
 
-    <!-- Кнопки управления в углу экрана -->
-    <div class="fixed top-4 right-4 z-50 flex gap-2">
-        <!-- Режим: Сетка / Список -->
-        <button onclick="toggleView()" class="p-2.5 rounded-full bg-white/90 dark:bg-[#1b1e1b] backdrop-blur border border-stone-200 dark:border-stone-800 shadow-sm text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-amber-400 transition-all">
-            <svg id="viewIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+    <div class="fixed top-3 right-3 z-50 flex gap-1.5">
+        <button onclick="toggleView()" class="p-2 rounded-full bg-stone-100 dark:bg-[#141614] border border-stone-200/60 dark:border-stone-800 text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-all">
+            <svg id="viewIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
             </svg>
         </button>
-        <!-- Переключатель: Тёмная / Светлая -->
-        <button onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/90 dark:bg-[#1b1e1b] backdrop-blur border border-stone-200 dark:border-stone-800 shadow-sm text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-amber-400 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 dark:hidden">
+        <button onclick="toggleTheme()" class="p-2 rounded-full bg-stone-100 dark:bg-[#141614] border border-stone-200/60 dark:border-stone-800 text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 dark:hidden">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
             </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden dark:block">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 hidden dark:block">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21M4.22 4.22l1.59 1.59m12.38 12.38l1.59 1.59M21 12h-2.25m-13.5 0H3m2.22 9.78l1.59-1.59M17.66 6.34l1.59-1.59M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" />
             </svg>
         </button>
     </div>
 
-    <!-- Шапка сайта -->
-    <header class="py-12 px-4 text-center border-b border-emerald-900/5 dark:border-stone-900 bg-white/60 dark:bg-[#151815]/60 backdrop-blur-md sticky top-0 z-40 transition-colors">
-        <div class="max-w-3xl mx-auto">
-            <h1 class="text-3xl md:text-4xl font-bold text-emerald-950 dark:text-emerald-400 mb-2 tracking-wide">99 Имен Аллаха</h1>
-            <p class="text-stone-500 dark:text-stone-400 text-sm md:text-base font-light mb-8">Прекрасные имена Всевышнего с переводом, толкованием и удобным поиском</p>
+    <header class="py-8 px-4 text-center bg-[#f9f9f6]/80 dark:bg-[#0d0e0d]/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-2xl md:text-3xl font-black text-stone-900 dark:text-stone-100 mb-1 tracking-tight">99 Имен Аллаха</h1>
+            <p class="text-stone-500 dark:text-stone-400 text-xs font-light mb-5">Прекрасные имена Всевышнего с переводом, толкованием и поиском</p>
             
-            <!-- Поле поиска -->
-            <div class="relative max-w-xl mx-auto">
+            <div class="relative max-w-md mx-auto">
                 <input type="text" id="searchInput" placeholder="Поиск по имени, переводу, номеру..." 
-                       class="w-full px-6 py-4 bg-white dark:bg-[#1a1d1a] border border-stone-200 dark:border-stone-800 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-700 dark:focus:ring-amber-500 focus:border-transparent transition-all pr-12 text-stone-700 dark:text-stone-200">
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                       class="w-full px-4 py-2 bg-stone-100 dark:bg-[#141614] border border-stone-200/60 dark:border-stone-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-400 dark:focus:ring-stone-600 focus:border-transparent transition-all pr-10 text-stone-800 dark:text-stone-200 text-xs">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.604 10.604Z" />
                     </svg>
                 </div>
@@ -67,192 +56,92 @@
         </div>
     </header>
 
-    <!-- Основной контент -->
-    <main class="max-w-7xl mx-auto px-4 py-12 flex-grow w-full">
-        <div id="namesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-all duration-300">
-            <!-- Карточки генерируются динамически -->
-        </div>
-        <div id="notFound" class="hidden text-center py-12 text-stone-400 font-light">Ничего не найдено. Попробуйте другой запрос.</div>
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+        <div id="namesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 transition-all duration-200"></div>
+        <div id="notFound" class="hidden text-center py-8 text-stone-400 text-xs font-light">Ничего не найдено. Попробуйте другой запрос.</div>
     </main>
 
-    <!-- Подвал -->
-    <footer class="py-6 border-t border-stone-200 dark:border-stone-900 text-center text-xs text-stone-400 dark:text-stone-500 font-light">
+    <footer class="py-4 border-t border-stone-200/60 dark:border-stone-900 text-center text-[10px] text-stone-400 dark:text-stone-500 font-light">
         © 2026 Прекрасные имена Аллаха. Сделано с уважением и любовью.
     </footer>
 
-    <!-- Модальное окно (Превью) -->
-    <div id="modal" class="fixed inset-0 bg-stone-950/40 dark:bg-stone-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-[#1a1d1a] rounded-3xl max-w-lg w-full p-8 shadow-2xl relative transform scale-95 transition-all duration-300 overflow-y-auto max-h-[90vh] border dark:border-stone-800">
+    <div id="fullscreenPage" class="fixed inset-0 bg-[#f9f9f6] dark:bg-[#0d0e0d] z-50 overflow-y-auto hidden opacity-0 transition-all duration-200 p-4 md:p-8">
+        <div class="max-w-xl mx-auto my-4">
             
-            <div class="absolute right-6 top-6 flex items-center gap-3 text-stone-400 dark:text-stone-500">
-                <!-- Стрелки увеличения в полный экран -->
-                <button id="expandBtn" class="hover:text-emerald-700 dark:hover:text-amber-400 transition-colors" title="Открыть полноэкранный режим">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 4.25v-4.5m0 4.5h-4.5m4.5 0L15 15" />
-                    </svg>
-                </button>
-                <button onclick="closeModal()" class="hover:text-stone-700 dark:hover:text-stone-200 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="text-center">
-                <span id="modalId" class="inline-block px-3 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/40 text-xs font-semibold rounded-full mb-4"></span>
-                <h2 id="modalArabic" class="arabic-text text-5xl md:text-6xl text-emerald-900 dark:text-emerald-400 my-4 tracking-wide"></h2>
-                <h3 id="modalTranslit" class="text-2xl font-bold text-stone-800 dark:text-stone-100"></h3>
-                <p id="modalTranslation" class="text-amber-600 dark:text-amber-500 font-medium mt-1 mb-6"></p>
-                <hr class="border-stone-100 dark:border-stone-800 my-4">
-                <div class="text-left space-y-4">
-                    <div>
-                        <h4 class="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Глубокое значение</h4>
-                        <p id="modalMeaning" class="text-stone-600 dark:text-stone-300 text-sm leading-relaxed font-light"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Полноэкранная страница (Улучшенный книжный дизайн) -->
-    <div id="fullscreenPage" class="fixed inset-0 bg-[#fdfbf7] dark:bg-[#121412] z-50 overflow-y-auto hidden opacity-0 translate-y-4 transition-all duration-300 p-4 md:p-12">
-        <div class="max-w-3xl mx-auto bg-white dark:bg-[#171a17] rounded-3xl p-6 md:p-12 border border-stone-200/80 dark:border-stone-900 shadow-xl my-4">
-            
-            <!-- Кнопка закрытия полного экрана -->
-            <button onclick="closeFullscreen()" class="mb-8 flex items-center gap-2 text-stone-500 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-amber-400 transition-colors font-medium text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            <button onclick="closeFullscreen()" class="mb-6 flex items-center gap-1.5 text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors font-medium text-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3. h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
-                Вернуться к списку имен
+                Назад
             </button>
 
-            <!-- Главный блок имени -->
-            <div class="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6 border-b border-stone-100 dark:border-stone-850 pb-8 mb-8">
-                <div class="space-y-2 text-center md:text-left">
-                    <span id="fsId" class="inline-block px-3 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/40 dark:border-amber-900/40 text-xs font-semibold rounded-full"></span>
-                    <h1 id="fsTranslit" class="text-4xl md:text-5xl font-bold text-stone-900 dark:text-stone-50 tracking-tight"></h1>
-                    <p id="fsTranslation" class="text-xl text-amber-600 dark:text-amber-400 font-semibold"></p>
-                    <!-- Теги -->
-                    <div id="fsTags" class="flex flex-wrap gap-1.5 pt-2 justify-center md:justify-start"></div>
+            <div class="flex items-center justify-between border-b border-stone-200/60 dark:border-stone-850 pb-4 mb-4">
+                <div class="space-y-0.5">
+                    <span id="fsId" class="text-[10px] font-mono opacity-40"></span>
+                    <h1 id="fsTranslit" class="text-xl font-black text-stone-900 dark:text-stone-50 tracking-tight"></h1>
+                    <p id="fsTranslation" class="text-xs text-stone-500 dark:text-stone-400 font-medium"></p>
                 </div>
-                <div id="fsArabic" class="arabic-text text-7xl md:text-8xl text-emerald-950 dark:text-emerald-400 text-center md:text-right select-none"></div>
+                <div id="fsArabic" class="arabic-text text-5xl text-stone-900 dark:text-stone-100 text-right select-none"></div>
             </div>
 
-            <!-- Контентные секции -->
-            <div class="space-y-8 text-base leading-relaxed text-stone-700 dark:text-stone-300">
+            <div class="space-y-5 text-xs text-stone-700 dark:text-stone-300">
                 
-                <!-- Значение -->
-                <div class="bg-stone-50/50 dark:bg-[#1e221e]/40 p-6 rounded-2xl border border-stone-200/40 dark:border-stone-800/60">
-                    <h2 class="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Глубокое смысловое толкование</h2>
-                    <p id="fsMeaning" class="font-light text-stone-850 dark:text-stone-200 md:text-lg leading-relaxed"></p>
+                <div class="space-y-1">
+                    <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Толкование</h2>
+                    <p id="fsMeaning" class="font-normal text-stone-800 dark:text-stone-200 leading-relaxed"></p>
                 </div>
 
-                <!-- Контекст / Дополнительная информация -->
-                <div id="fsRootBlock" class="hidden">
-                    <h2 class="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest mb-2">Понимание имени и контекст</h2>
-                    <p id="fsRoot" class="font-light text-sm text-stone-600 dark:text-stone-400"></p>
+                <div id="fsRootBlock" class="hidden space-y-1">
+                    <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Контекст</h2>
+                    <p id="fsRoot" class="font-light text-stone-600 dark:text-stone-400 leading-relaxed"></p>
                 </div>
 
-                <!-- Примечания -->
-                <div id="fsNotesBlock" class="hidden text-xs bg-amber-50/30 dark:bg-amber-950/10 text-amber-800 dark:text-amber-400/80 p-4 rounded-xl border border-amber-200/20 dark:border-amber-900/20">
-                    <strong>Примечание:</strong> <span id="fsNotes" class="font-light"></span>
+                <div id="fsNotesBlock" class="hidden text-[11px] bg-stone-100 dark:bg-[#141614] p-3 rounded-lg border border-stone-200/40 dark:border-stone-800/40 text-stone-600 dark:text-stone-400">
+                    <span id="fsNotes" class="font-light"></span>
                 </div>
 
-                <!-- Коран (Блок ссылок) -->
-                <div class="space-y-3">
-                    <h2 class="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Упоминания в Священном Коране</h2>
-                    <div id="fsQuranContainer" class="grid grid-cols-1 gap-4"></div>
+                <div class="space-y-1.5">
+                    <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Коран</h2>
+                    <div id="fsQuranContainer" class="space-y-1.5"></div>
                 </div>
 
-                <!-- Хадисы -->
-                <div id="fsHadithSection" class="space-y-3 hidden">
-                    <h2 class="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Упоминания в Сунне и Хадисах</h2>
-                    <div id="fsHadithContainer" class="grid grid-cols-1 gap-4"></div>
+                <div id="fsHadithSection" class="space-y-1.5 hidden">
+                    <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Хадисы</h2>
+                    <div id="fsHadithContainer" class="space-y-1.5"></div>
                 </div>
 
-                <!-- Дуа -->
-                <div id="fsDuaSection" class="space-y-4 hidden">
-                    <h2 class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-                        🌙 Дуа (Мольбы к Всевышнему посредством этого Имени)
-                    </h2>
-                    <div id="fsDuaContainer" class="space-y-4"></div>
+                <div id="fsDuaSection" class="space-y-2 hidden">
+                    <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Дуа</h2>
+                    <div id="fsDuaContainer" class="space-y-2"></div>
                 </div>
 
             </div>
         </div>
     </div>
 
-    <!-- ЛОГИКА И ДАННЫЕ СИСТЕМЫ -->
     <script>
-        // Твоя гибкая JSON Архитектура данных
-        const namesData = [
-            { 
-                id: 1, 
-                arabic: "الرَّحْمَنُ", 
-                translit: "Ар-Рахман", 
-                translation: "Всемилостивый", 
-                meaning: "Обладающий безграничной милостью, которая охватывает абсолютно все Его творения в этом мире (и верующих, и неверующих).", 
-                root_000: "Его милость опережает Его гнев. Это имя принадлежит только Создателю, и называть им творения строго запрещено.",
-                notes: "Входит в число 99 основных имен.",
-                is_core: true,
-                tags: ["Милость", "Забота", "Всеобъемлемость"],
-                quran_references: [
-                    { surah: 55, ayah: 1, text_arabic: "الرَّحْمَنُ", text_russian: "Милостивый", link_q: "https://quran.com/55:1" }
-                ],
-                hadith_references: [],
-                duas: [
-                    { arabic: "يَا Рَاحْمَانُ ارْحَمْنَا بِرَحْمَتِكَ الْوَاسِعَةِ", translit: "Йа Рахману, ирхамна би-рахматика-ль-васи'ати", translation: "О Всемилостивый, помилуй нас Своей всеобъемлющей милостью." }
-                ]
-            },
-            {
-                id: 5,
-                arabic: "الْقُدُّوسُ",
-                translit: "Аль-Куддус",
-                translation: "Святой",
-                meaning: "Абсолютно Чистый от любых видов недостатков, пороков, упущений, слабостей или сходства с творениями. Тот, Кто совершенен во всех Своих качествах и действиях.",
-                root_000: "Понимание этого имени обязывает человека очищать свое поклонение от многобожия и показухи, а разум — от ложных представлений о Боге. Оно часто упоминается в Коране и Сунне в паре с именем Аль-Малик, подчеркивая, что Правитель Вселенной лишен несправедливости.",
-                notes: "Входит в число 99 основных имен.",
-                is_core: true,
-                tags: ["Чистота", "Святость", "Совершенство", "Безгрешность"],
-                quran_references: [
-                    { surah: 59, ayah: 23, text_arabic: "الْمَلِكُ الْقُدُّوسُ", text_russian: "Владыка, Святой", link_q: null },
-                    { surah: 62, ayah: 1, text_arabic: "الْمَلِكِ الْقُدُّوسِ", text_russian: "Владыку, Святого", link_q: null }
-                ],
-                hadith_references: [
-                    { collection: "Сахих Муслим", number: 487, narrator: "Аиша", text_arabic: "سُبُّوحٌ قُدُّوسٌ رَبُّ الْمَلَائِكَةِ وَالرُّوحِ", text_russian: "Преславный, Святой, Господь ангелов и Духа." }
-                ],
-                duas: [
-                    { arabic: "يَا قُدُّوسُ طَهِّرْنِي", translit: "Йа Куддусу, таххирни", translation: "О Святой, очисти меня." },
-                    { arabic: "يَا قُدُّوسُ طَهِّرْ قَلْبِي مِنَ النِّفَاقِ وَعَمَلِي مِنَ الرِّиَاءِ وَلِسَانِي مِنَ الْكَذِبِ", translit: "Йа Куддусу, таххир кальби мина-н-нифаки ва 'амали мина-р-рийа'и ва лисани мина-ль-казиб", translation: "О Святой, очисти мое сердце от лицемерия, мои деяния от показухи, а мой язык от лжи." }
-                ]
-            }
-        ];
-
+        let namesData = [];
         let currentView = 'grid';
         const namesGrid = document.getElementById('namesGrid');
         const searchInput = document.getElementById('searchInput');
         const notFound = document.getElementById('notFound');
-        const modal = document.getElementById('modal');
         const fullscreenPage = document.getElementById('fullscreenPage');
 
-        // Логика темы
         function toggleTheme() { document.documentElement.classList.toggle('dark'); }
 
-        // Логика Вида (Сетка/Список)
         function toggleView() {
             currentView = currentView === 'grid' ? 'list' : 'grid';
             const icon = document.getElementById('viewIcon');
             if (currentView === 'list') {
-                namesGrid.className = "max-w-3xl mx-auto space-y-3 transition-all duration-300";
+                namesGrid.className = "max-w-md mx-auto space-y-1.5 transition-all duration-200";
                 icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />`;
             } else {
-                namesGrid.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-all duration-300";
+                namesGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 transition-all duration-200";
                 icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />`;
             }
             renderCards(getFilteredData());
         }
 
-        // Вычисление опечаток (Алгоритм Левенштейна)
         function levenshtein(a, b) {
             const tmp = [];
             for (let i = 0; i <= a.length; i++) { tmp[i] = [i]; }
@@ -269,12 +158,11 @@
             return tmp[a.length][b.length];
         }
 
-        // Проверка совпадения слова с учетом опечатки
         function checkWordMatch(queryWord, targetText) {
             if (!targetText) return false;
             const text = targetText.toLowerCase();
             if (text.includes(queryWord)) return true;
-            if (queryWord.length <= 3) return false; // Для коротких слов отключаем опечатки
+            if (queryWord.length <= 3) return false;
 
             const targetWords = text.split(/[^a-zа-яё0-9]+/);
             const maxAllowedTypos = queryWord.length >= 6 ? 2 : 1;
@@ -285,7 +173,6 @@
             });
         }
 
-        // Умная фильтрация данных
         function getFilteredData() {
             const query = searchInput.value.toLowerCase().trim();
             if (!query) return namesData;
@@ -306,7 +193,6 @@
             });
         }
 
-        // Рендеринг карточек главного меню
         function renderCards(data) {
             namesGrid.innerHTML = '';
             if (data.length === 0) {
@@ -317,32 +203,34 @@
 
             data.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.setAttribute('onclick', `openModal(${item.id})`);
-                card.style.animationDelay = `${index * 15}ms`;
+                card.setAttribute('onclick', `openFullscreen(${item.id})`);
+                card.style.animationDelay = `${index * 10}ms`;
                 
+                const formattedId = item.id < 10 ? `0${item.id}` : item.id;
+
                 if (currentView === 'grid') {
-                    card.className = "bg-white dark:bg-[#181a18] border border-stone-200/60 dark:border-stone-850 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group opacity-0 animate-card";
+                    card.className = "bg-stone-150/40 dark:bg-[#141614] border border-stone-200/40 dark:border-stone-850 rounded-xl p-3.5 hover:border-stone-300 dark:hover:border-stone-700 transition-all duration-200 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-md border border-amber-150 dark:border-amber-900/30">${item.id}</span>
-                            <span class="arabic-text text-3xl text-emerald-900 dark:text-emerald-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">${item.arabic}</span>
+                        <div class="flex justify-between items-baseline mb-2">
+                            <span class="text-[10px] font-mono opacity-40">${formattedId}</span>
+                            <span class="arabic-text text-xl text-stone-800 dark:text-stone-200">${item.arabic}</span>
                         </div>
                         <div>
-                            <h3 class="font-bold text-stone-800 dark:text-stone-100 text-lg leading-tight">${item.translit}</h3>
-                            <p class="text-stone-400 dark:text-stone-400 text-sm mt-1 font-light">${item.translation}</p>
+                            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-xs tracking-tight">${item.translit}</h3>
+                            <p class="text-stone-500 dark:text-stone-400 text-[11px] font-light truncate">${item.translation}</p>
                         </div>
                     `;
                 } else {
-                    card.className = "bg-white dark:bg-[#181a18] border border-stone-200/60 dark:border-stone-850 rounded-xl px-6 py-4 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-between group opacity-0 animate-card";
+                    card.className = "bg-stone-150/40 dark:bg-[#141614] border border-stone-200/40 dark:border-stone-850 rounded-lg px-4 py-2.5 hover:border-stone-300 dark:hover:border-stone-700 transition-all duration-200 cursor-pointer flex items-center justify-between opacity-0 animate-card";
                     card.innerHTML = `
-                        <div class="flex items-center gap-4">
-                            <span class="text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 w-8 h-8 flex items-center justify-center rounded-full border border-amber-150 dark:border-amber-900/30">${item.id}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-mono opacity-40 w-4">${formattedId}</span>
                             <div>
-                                <h3 class="font-bold text-stone-800 dark:text-stone-100 text-base inline-block">${item.translit}</h3>
-                                <span class="text-stone-400 dark:text-stone-500 text-xs font-light ml-2">— ${item.translation}</span>
+                                <h3 class="font-bold text-stone-900 dark:text-stone-100 text-xs inline-block tracking-tight">${item.translit}</h3>
+                                <span class="text-stone-500 dark:text-stone-400 text-[11px] font-light ml-1.5">— ${item.translation}</span>
                             </div>
                         </div>
-                        <span class="arabic-text text-2xl text-emerald-900 dark:text-emerald-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">${item.arabic}</span>
+                        <span class="arabic-text text-lg text-stone-800 dark:text-stone-200">${item.arabic}</span>
                     `;
                 }
                 namesGrid.appendChild(card);
@@ -351,61 +239,16 @@
 
         searchInput.addEventListener('input', () => renderCards(getFilteredData()));
 
-        // Модальное окно (Превью)
-        function openModal(id) {
-            const item = namesData.find(n => n.id === id);
-            if (!item) return;
-
-            document.getElementById('modalId').innerText = `Имя №${item.id}`;
-            document.getElementById('modalArabic').innerText = item.arabic;
-            document.getElementById('modalTranslit').innerText = item.translit;
-            document.getElementById('modalTranslation').innerText = item.translation;
-            document.getElementById('modalMeaning').innerText = item.meaning;
-
-            document.getElementById('expandBtn').onclick = () => openFullscreen(item.id);
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeModal() {
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-        // Полноекранный режим на основе Новой Архитектуры JSON
         function openFullscreen(id) {
             const item = namesData.find(n => n.id === id);
             if (!item) return;
 
-            closeModal();
-
-            // Базовые данные
-            document.getElementById('fsId').innerText = `Имя №${item.id}`;
+            document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
             document.getElementById('fsTranslit').innerText = item.translit;
             document.getElementById('fsTranslation').innerText = item.translation;
             document.getElementById('fsArabic').innerText = item.arabic;
             document.getElementById('fsMeaning').innerText = item.meaning;
 
-            // Вывод категорий/тегов
-            const tagsContainer = document.getElementById('fsTags');
-            tagsContainer.innerHTML = '';
-            if (item.tags && item.tags.length > 0) {
-                item.tags.forEach(tag => {
-                    const span = document.createElement('span');
-                    span.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30";
-                    span.innerText = tag;
-                    tagsContainer.appendChild(span);
-                });
-            }
-
-            // Вывод объемной информации (root_000)
             const rootBlock = document.getElementById('fsRootBlock');
             if (item.root_000) {
                 rootBlock.classList.remove('hidden');
@@ -414,37 +257,41 @@
                 rootBlock.classList.add('hidden');
             }
 
-            // Вывод примечаний (notes)
             const notesBlock = document.getElementById('fsNotesBlock');
-            if (item.notes) {
+            if (!item.is_core && item.notes) {
                 notesBlock.classList.remove('hidden');
                 document.getElementById('fsNotes').innerText = item.notes;
             } else {
                 notesBlock.classList.add('hidden');
             }
 
-            // Вывод Коранических Упоминаний
             const quranContainer = document.getElementById('fsQuranContainer');
             quranContainer.innerHTML = '';
             if (item.quran_references && item.quran_references.length > 0) {
                 item.quran_references.forEach(ref => {
-                    const div = document.createElement('div');
-                    div.className = "p-5 rounded-xl bg-stone-50/50 dark:bg-[#1a1d1a] border border-stone-200/50 dark:border-stone-850 space-y-2 transition-all";
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
+                    const wrap = ref.link_q ? document.createElement('a') : document.createElement('div');
+                    if (ref.link_q) {
+                        wrap.setAttribute('href', ref.link_q);
+                        wrap.setAttribute('target', '_blank');
+                    }
+                    wrap.className = "p-3 rounded-lg bg-stone-100 dark:bg-[#141614] border border-stone-200/40 dark:border-stone-850 space-y-1 block transition-opacity hover:opacity-90";
+                    wrap.innerHTML = `
+                        <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
                             <span>Сура ${ref.surah}, Аят ${ref.ayah}</span>
-                            ${ref.link_q ? `<a href="${ref.link_q}" target="_blank" class="hover:underline flex items-center gap-1 text-[11px]">Коран онлайн ↗</a>` : ''}
+                            ${ref.link_q ? `
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2.5 h-2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>` : ''}
                         </div>
-                        <div class="arabic-text text-3xl text-right text-emerald-950 dark:text-emerald-300 leading-loose">${ref.text_arabic}</div>
-                        <p class="text-stone-600 dark:text-stone-300 text-sm font-light italic leading-relaxed">«${ref.text_russian}»</p>
+                        <div class="arabic-text text-xl text-right text-stone-800 dark:text-stone-200 leading-normal">${ref.text_arabic}</div>
+                        <p class="text-stone-600 dark:text-stone-400 font-light italic leading-relaxed">«${ref.text_russian}»</p>
                     `;
-                    quranContainer.appendChild(div);
+                    quranContainer.appendChild(wrap);
                 });
             } else {
-                quranContainer.innerHTML = `<p class="text-stone-400 text-xs font-light">Упоминания подготавливаются...</p>`;
+                quranContainer.innerHTML = `<p class="text-stone-400 text-[11px] font-light">Упоминания отсутствуют.</p>`;
             }
 
-            // Вывод Хадисов
             const hadithSection = document.getElementById('fsHadithSection');
             const hadithContainer = document.getElementById('fsHadithContainer');
             hadithContainer.innerHTML = '';
@@ -452,13 +299,13 @@
                 hadithSection.classList.remove('hidden');
                 item.hadith_references.forEach(ref => {
                     const div = document.createElement('div');
-                    div.className = "p-5 rounded-xl bg-stone-50/50 dark:bg-[#1a1d1a] border border-stone-200/50 dark:border-stone-850 space-y-2";
+                    div.className = "p-3 rounded-lg bg-stone-100 dark:bg-[#141614] border border-stone-200/40 dark:border-stone-850 space-y-1";
                     div.innerHTML = `
-                        <div class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">
-                            ${ref.collection} ${ref.number ? `№${ref.number}` : ''} ${ref.narrator ? `(передал ${ref.narrator})` : ''}
+                        <div class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+                            ${ref.collection} ${ref.number ? `№${ref.number}` : ''} ${ref.narrator ? `(${ref.narrator})` : ''}
                         </div>
-                        ${ref.text_arabic ? `<div class="arabic-text text-2xl text-right text-stone-800 dark:text-stone-300 leading-loose">${ref.text_arabic}</div>` : ''}
-                        <p class="text-stone-600 dark:text-stone-300 text-sm font-light leading-relaxed">${ref.text_russian}</p>
+                        ${ref.text_arabic ? `<div class="arabic-text text-lg text-right text-stone-800 dark:text-stone-200 leading-normal">${ref.text_arabic}</div>` : ''}
+                        <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed">${ref.text_russian}</p>
                     `;
                     hadithContainer.appendChild(div);
                 });
@@ -466,21 +313,19 @@
                 hadithSection.classList.add('hidden');
             }
 
-            // Вывод Массива Дуа
             const duaSection = document.getElementById('fsDuaSection');
             const duaContainer = document.getElementById('fsDuaContainer');
             duaContainer.innerHTML = '';
             if (item.duas && item.duas.length > 0) {
                 duaSection.classList.remove('hidden');
-                item.duas.forEach((dua, idx) => {
+                item.duas.forEach(dua => {
                     const div = document.createElement('div');
-                    div.className = "p-6 rounded-2xl bg-amber-50/20 dark:bg-[#202420]/30 border border-amber-200/30 dark:border-stone-800/80 space-y-4";
+                    div.className = "p-3.5 rounded-xl bg-stone-100 dark:bg-[#141614] border border-stone-200/40 dark:border-stone-850 space-y-2";
                     div.innerHTML = `
-                        <div class="text-[11px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest">Версия мольбы #${idx + 1}</div>
-                        <div class="arabic-text text-3xl text-emerald-950 dark:text-emerald-400 text-right leading-loose select-all">${dua.arabic}</div>
-                        <div class="space-y-2 pt-2 border-t border-stone-200/30 dark:border-stone-800/40">
-                            ${dua.translit ? `<div><span class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest block">Транслитерация</span><p class="text-stone-800 dark:text-stone-200 font-medium text-sm leading-normal">${dua.translit}</p></div>` : ''}
-                            <div><span class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest block">Смысловой перевод</span><p class="text-stone-600 dark:text-stone-300 font-light text-sm leading-relaxed">${dua.translation}</p></div>
+                        <div class="arabic-text text-xl text-stone-900 dark:text-stone-100 text-right leading-normal select-all">${dua.arabic}</div>
+                        <div class="space-y-1 pt-1.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                            ${dua.translit ? `<div><p class="text-stone-800 dark:text-stone-200 font-medium">${dua.translit}</p></div>` : ''}
+                            <div><p class="text-stone-500 dark:text-stone-400 font-light leading-relaxed">${dua.translation}</p></div>
                         </div>
                     `;
                     duaContainer.appendChild(div);
@@ -489,21 +334,69 @@
                 duaSection.classList.add('hidden');
             }
 
-            // Плавное открытие страницы
             fullscreenPage.classList.remove('hidden');
-            setTimeout(() => {
-                fullscreenPage.classList.remove('opacity-0', 'translate-y-4');
-            }, 30);
-            fullscreenPage.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => { fullscreenPage.classList.remove('opacity-0'); }, 10);
+            fullscreenPage.scrollTo({ top: 0 });
         }
 
         function closeFullscreen() {
-            fullscreenPage.classList.add('opacity-0', 'translate-y-4');
-            setTimeout(() => fullscreenPage.classList.add('hidden'), 300);
+            fullscreenPage.classList.add('opacity-0');
+            setTimeout(() => fullscreenPage.classList.add('hidden'), 200);
         }
 
-        // Стартовый рендеринг при запуске CodePen
-        renderCards(namesData);
+        async function loadNamesFromServer() {
+            try {
+                const response = await fetch('names.json');
+                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+                namesData = await response.json();
+                renderCards(namesData);
+            } catch (error) {
+                console.error(error);
+                namesData = [
+                    {
+                        id: 1,
+                        arabic: "الرَّحْمَنُ",
+                        translit: "Ар-Рахман",
+                        translation: "Всемилостивый",
+                        meaning: "Обладающий безграничной милостью, которая охватывает абсолютно все Его творения в этом мире (и верующих, и неверующих).",
+                        root_000: "Его милость опережает Его гнев. Это имя принадлежит только Создателю, и называть им творения строго запрещено.",
+                        notes: "Входит в число 99 основных имен.",
+                        is_core: true,
+                        tags: ["Милость", "Забота"],
+                        quran_references: [
+                            { surah: 55, ayah: 1, text_arabic: "الرَّحْمَنُ", text_russian: "Милостивый", link_q: "https://quran.com/55:1" }
+                        ],
+                        hadith_references: [],
+                        duas: [
+                            { arabic: "يَا رَحْمَانُ ارْحَمْنَا بِرَحْمَتِكَ الْوَاسِعَةِ", translit: "Йа Рахману, ирхамна би-рахматика-ль-васи'ати", translation: "О Всемилостивый, помилуй нас Своей всеобъемлющей милостью." }
+                        ]
+                    },
+                    {
+                        id: 5,
+                        arabic: "الْقُدُّوسُ",
+                        translit: "Аль-Куддус",
+                        translation: "Святой",
+                        meaning: "Абсолютно Чистый от любых видов недостатков, пороков, упущений, слабостей или сходства с творениями. Тот, Кто совершенен во всех Своих качествах и действиях.",
+                        root_000: "Понимание этого имени обязывает человека очищать свое поклонение от многобожия и показухи, а разум — от ложных представлений о Боге.",
+                        notes: "Входит в число 99 основных имен.",
+                        is_core: true,
+                        tags: ["Чистота", "Святость"],
+                        quran_references: [
+                            { surah: 59, ayah: 23, text_arabic: "الْمَلِكُ الْقُدُّوسُ", text_russian: "Владыка, Святой", link_q: null }
+                        ],
+                        hadith_references: [
+                            { collection: "Сахих Муслим", number: 487, narrator: "Аиша", text_arabic: "سُبُّوحٌ قُدُّوسٌ رَبُّ الْمَلَائِكَةِ وَالرُّوحِ", text_russian: "Преславный, Святой, Господь ангелов и Духа." }
+                        ],
+                        duas: [
+                            { arabic: "يَا قُدُّوسُ طَهِّرْنِي", translit: "Йа Куддусу, таххирни", translation: "О Святой, очисти меня." }
+                        ]
+                    }
+                ];
+                renderCards(namesData);
+            }
+        }
+
+        loadNamesFromServer();
     </script>
 </body>
 </html>
