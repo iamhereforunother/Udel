@@ -201,293 +201,304 @@
         </div>
     </div>
 
-    <script>
-        let namesData = [];
-        let currentView = 'grid';
-        const namesGrid = document.getElementById('namesGrid');
-        const searchInput = document.getElementById('searchInput');
-        const notFound = document.getElementById('notFound');
-        const fullscreenPage = document.getElementById('fullscreenPage');
+<script>
+    let namesData = [];
+    let currentView = 'grid';
+    const namesGrid = document.getElementById('namesGrid');
+    const searchInput = document.getElementById('searchInput');
+    const notFound = document.getElementById('notFound');
+    const fullscreenPage = document.getElementById('fullscreenPage');
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+    initTheme();
+
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    function toggleView() {
+        currentView = currentView === 'grid' ? 'list' : 'grid';
+        const icon = document.getElementById('viewIcon');
+        if (currentView === 'list') {
+            namesGrid.className = "max-w-md mx-auto space-y-2 transition-all duration-300";
+            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />`;
+        } else {
+            namesGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 transition-all duration-300";
+            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />`;
+        }
+        renderCards(getFilteredData());
+    }
+
+    function levenshtein(a, b) {
+        const tmp = [];
+        for (let i = 0; i <= a.length; i++) { tmp[i] = [i]; }
+        for (let j = 0; j <= b.length; j++) { tmp[0][j] = j; }
+        for (let i = 1; i <= a.length; i++) {
+            for (let j = 1; j <= b.length; j++) {
+                tmp[i][j] = Math.min(
+                    tmp[i - 1][j] + 1,
+                    tmp[i][j - 1] + 1,
+                    tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+                );
             }
         }
-        initTheme();
+        return tmp[a.length][b.length];
+    }
 
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+    // Вспомогательная функция для удаления апострофов, кавычек и дефисов/тире
+    function normalizeString(str) {
+        if (!str) return '';
+        return str
+            .toLowerCase()
+            // Удаляет: ' ` ’ ‘ “ ” ´ ʻ ʼ " - – —
+            .replace(/['\`‘’“”´ʻʼ\"\-–—]/g, '');
+    }
 
-        function toggleView() {
-            currentView = currentView === 'grid' ? 'list' : 'grid';
-            const icon = document.getElementById('viewIcon');
-            if (currentView === 'list') {
-                namesGrid.className = "max-w-md mx-auto space-y-2 transition-all duration-300";
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />`;
-            } else {
-                namesGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 transition-all duration-300";
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />`;
-            }
-            renderCards(getFilteredData());
-        }
+    function checkWordMatch(queryWord, targetText) {
+        if (!targetText) return false;
+        
+        // Нормализуем обе строки перед проверкой
+        const normalizedTarget = normalizeString(targetText);
+        const normalizedQuery = normalizeString(queryWord);
 
-        function levenshtein(a, b) {
-            const tmp = [];
-            for (let i = 0; i <= a.length; i++) { tmp[i] = [i]; }
-            for (let j = 0; j <= b.length; j++) { tmp[0][j] = j; }
-            for (let i = 1; i <= a.length; i++) {
-                for (let j = 1; j <= b.length; j++) {
-                    tmp[i][j] = Math.min(
-                        tmp[i - 1][j] + 1,
-                        tmp[i][j - 1] + 1,
-                        tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
-                    );
-                }
-            }
-            return tmp[a.length][b.length];
-        }
+        if (normalizedTarget.includes(normalizedQuery)) return true;
+        if (normalizedQuery.length <= 3) return false;
 
-        function checkWordMatch(queryWord, targetText) {
-            if (!targetText) return false;
-            const text = targetText.toLowerCase();
-            if (text.includes(queryWord)) return true;
-            if (queryWord.length <= 3) return false;
+        // Разбиваем нормализованный текст на слова для алгоритма Левенштейна
+        const targetWords = normalizedTarget.split(/[^a-zа-яё0-9]+/);
+        const maxAllowedTypos = normalizedQuery.length >= 6 ? 2 : 1;
 
-            const targetWords = text.split(/[^a-zа-яё0-9]+/);
-            const maxAllowedTypos = queryWord.length >= 6 ? 2 : 1;
+        return targetWords.some(tWord => {
+            if (Math.abs(tWord.length - normalizedQuery.length) > maxAllowedTypos) return false;
+            return levenshtein(normalizedQuery, tWord) <= maxAllowedTypos;
+        });
+    }
 
-            return targetWords.some(tWord => {
-                if (Math.abs(tWord.length - queryWord.length) > maxAllowedTypos) return false;
-                return levenshtein(queryWord, tWord) <= maxAllowedTypos;
+    function getFilteredData() {
+        const query = searchInput.value.trim();
+        if (!query) return namesData;
+        
+        // Разбиваем поисковый запрос по пробелам и нормализуем каждое слово отдельно
+        const queryWords = query.split(/\s+/).map(word => normalizeString(word)).filter(Boolean);
+
+        return namesData.filter(item => {
+            return queryWords.every(word => {
+                return (
+                    item.id.toString() === word ||
+                    checkWordMatch(word, item.translit) ||
+                    checkWordMatch(word, item.translation) ||
+                    checkWordMatch(word, item.meaning) ||
+                    item.arabic.includes(word)
+                );
             });
+        });
+    }
+
+    function renderCards(data) {
+        namesGrid.innerHTML = '';
+        if (data.length === 0) {
+            notFound.classList.remove('hidden');
+            return;
         }
+        notFound.classList.add('hidden');
 
-        function getFilteredData() {
-            const query = searchInput.value.toLowerCase().trim();
-            if (!query) return namesData;
-            const queryWords = query.split(/\s+/);
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.setAttribute('onclick', `openFullscreen(${item.id})`);
+            card.setAttribute('data-card-id', item.id);
+            card.style.animationDelay = `${index * 15}ms`;
 
-            return namesData.filter(item => {
-                return queryWords.every(word => {
-                    return (
-                        item.id.toString() === word ||
-                        checkWordMatch(word, item.translit) ||
-                        checkWordMatch(word, item.translation) ||
-                        checkWordMatch(word, item.meaning) ||
-                        item.arabic.includes(word)
-                    );
-                });
-            });
-        }
+            const formattedId = item.id < 10 ? `0${item.id}` : item.id;
 
-        function renderCards(data) {
-            namesGrid.innerHTML = '';
-            if (data.length === 0) {
-                notFound.classList.remove('hidden');
-                return;
-            }
-            notFound.classList.add('hidden');
-
-            data.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.setAttribute('onclick', `openFullscreen(${item.id})`);
-                card.setAttribute('data-card-id', item.id);
-                card.style.animationDelay = `${index * 15}ms`;
-
-                const formattedId = item.id < 10 ? `0${item.id}` : item.id;
-
-                if (currentView === 'grid') {
-                    card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-baseline mb-3">
-                            <span class="text-[10px] font-mono opacity-40">${formattedId}</span>
-                            <span class="arabic-text text-2xl text-stone-800 dark:text-stone-200 leading-none">${item.arabic}</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-[13px] tracking-tight mb-0.5">${item.translit}</h3>
-                            <p class="text-stone-500 dark:text-stone-400 text-[11px] font-light truncate">${item.translation}</p>
-                        </div>
-                    `;
-                } else {
-                    card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between opacity-0 animate-card";
-                    card.innerHTML = `
-                        <div class="flex items-center gap-4">
-                            <span class="text-[10px] font-mono opacity-40 w-4">${formattedId}</span>
-                            <div>
-                                <h3 class="font-bold text-stone-900 dark:text-stone-100 text-[13px] inline-block tracking-tight">${item.translit}</h3>
-                                <span class="text-stone-500 dark:text-stone-400 text-[11px] font-light ml-2">— ${item.translation}</span>
-                            </div>
-                        </div>
-                        <span class="arabic-text text-xl text-stone-800 dark:text-stone-200">${item.arabic}</span>
-                    `;
-                }
-                namesGrid.appendChild(card);
-            });
-        }
-
-        searchInput.addEventListener('input', () => renderCards(getFilteredData()));
-
-        function openFullscreen(id) {
-            const item = namesData.find(n => n.id === id);
-            if (!item) return;
-
-            document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
-            document.getElementById('fsTranslit').innerText = item.translit;
-            document.getElementById('fsTranslation').innerText = item.translation;
-            document.getElementById('fsArabic').innerText = item.arabic;
-            document.getElementById('fsMeaning').innerText = item.meaning;
-
-            const rootBlock = document.getElementById('fsRootBlock');
-            if (item.root_000) {
-                rootBlock.classList.remove('hidden');
-                document.getElementById('fsRoot').innerText = item.root_000;
-            } else {
-                rootBlock.classList.add('hidden');
-            }
-
-            // Логика технической информации (если не входит в 99)
-            const notesBlock = document.getElementById('fsNotesBlock');
-            if (item.is_core === false) {
-                notesBlock.classList.remove('hidden');
-                document.getElementById('fsNotes').innerText = item.notes || "Это имя не входит в традиционный, наиболее распространенный список 99 имён, однако оно упоминается в Коране или достоверных хадисах.";
-            } else {
-                notesBlock.classList.add('hidden');
-            }
-
-            // Суры в виде блоков
-            const quranSection = document.getElementById('fsQuranSection');
-            const quranContainer = document.getElementById('fsQuranContainer');
-            quranContainer.innerHTML = '';
-            if (item.quran_references && item.quran_references.length > 0) {
-                quranSection.classList.remove('hidden');
-                item.quran_references.forEach(ref => {
-                    const wrap = ref.link_q ? document.createElement('a') : document.createElement('div');
-                    if (ref.link_q) {
-                        wrap.setAttribute('href', ref.link_q);
-                        wrap.setAttribute('target', '_blank');
-                    }
-                    wrap.className = "block p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3 transition-colors hover:border-stone-300 dark:hover:border-stone-600";
-                    wrap.innerHTML = `
-                        <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
-                            <span>Сура ${ref.surah}, Аят ${ref.ayah}</span>
-                            ${ref.link_q ? `
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                            </svg>` : ''}
-                        </div>
-                        <div class="arabic-text text-2xl md:text-3xl text-right text-stone-900 dark:text-stone-100 leading-normal select-all">${ref.text_arabic}</div>
-                        <div class="pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
-                            <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed text-xs">«${ref.text_russian}»</p>
-                        </div>
-                    `;
-                    quranContainer.appendChild(wrap);
-                });
-            } else {
-                quranSection.classList.add('hidden');
-            }
-
-            // Хадисы в виде блоков
-            const hadithSection = document.getElementById('fsHadithSection');
-            const hadithContainer = document.getElementById('fsHadithContainer');
-            hadithContainer.innerHTML = '';
-            if (item.hadith_references && item.hadith_references.length > 0) {
-                hadithSection.classList.remove('hidden');
-                item.hadith_references.forEach(ref => {
-                    const isLinked = ref.link_h && ref.link_h.trim() !== '';
-                    const wrap = document.createElement(isLinked ? 'a' : 'div');
-                    if (isLinked) {
-                        wrap.setAttribute('href', ref.link_h);
-                        wrap.setAttribute('target', '_blank');
-                    }
-                    wrap.className = "block p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3 transition-colors" + (isLinked ? " hover:border-stone-300 dark:hover:border-stone-600" : "");
-                    wrap.innerHTML = `
-                        <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
-                            <span>${ref.collection} ${ref.number ? `№${ref.number}` : ''} ${ref.narrator ? `• ${ref.narrator}` : ''}</span>
-                            ${isLinked ? `
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                            </svg>` : ''}
-                        </div>
-                        ${ref.text_arabic ? `<div class="arabic-text text-2xl md:text-3xl text-right text-stone-900 dark:text-stone-100 leading-normal select-all">${ref.text_arabic}</div>` : ''}
-                        <div class="pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
-                            <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed text-xs">«${ref.text_russian}»</p>
-                        </div>
-                    `;
-                    hadithContainer.appendChild(wrap);
-                });
-            } else {
-                hadithSection.classList.add('hidden');
-            }
-
-            // Дуа в виде блоков
-            const duaSection = document.getElementById('fsDuaSection');
-            const duaContainer = document.getElementById('fsDuaContainer');
-            duaContainer.innerHTML = '';
-            if (item.duas && item.duas.length > 0) {
-                duaSection.classList.remove('hidden');
-                item.duas.forEach(dua => {
-                    const wrap = document.createElement('div');
-                    wrap.className = "p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3";
-                    wrap.innerHTML = `
-                        <div class="arabic-text text-2xl md:text-3xl text-stone-900 dark:text-stone-100 text-right leading-normal select-all">${dua.arabic}</div>
-                        <div class="space-y-1.5 pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
-                            ${dua.translit ? `<div><p class="text-stone-800 dark:text-stone-200 text-xs font-medium">${dua.translit}</p></div>` : ''}
-                            <div><p class="text-stone-500 dark:text-stone-400 text-xs font-light leading-relaxed">${dua.translation}</p></div>
-                        </div>
-                    `;
-                    duaContainer.appendChild(wrap);
-                });
-            } else {
-                duaSection.classList.add('hidden');
-            }
-
-            fullscreenPage.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                fullscreenPage.classList.remove('opacity-0');
-            });
-            fullscreenPage.scrollTo({ top: 0 });
-        }
-
-        function closeFullscreen() {
-            fullscreenPage.classList.add('opacity-0');
-            setTimeout(() => fullscreenPage.classList.add('hidden'), 300);
-        }
-
-        async function loadNamesFromServer() {
-            try {
-                const response = await fetch('names.json');
-                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
-                namesData = await response.json();
-                renderCards(namesData);
-            } catch (error) {
-                console.error(error);
-                // Нативная заглушка об ошибке вместо тестовых данных
-                namesGrid.innerHTML = '';
-                namesGrid.className = "flex justify-center items-center h-48 w-full col-span-full transition-all duration-300";
-                namesGrid.innerHTML = `
-                    <div class="text-center p-6 bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl max-w-sm w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mx-auto text-stone-400 mb-3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <p class="text-stone-800 dark:text-stone-200 text-sm font-medium mb-1">Не удалось загрузить данные</p>
-                        <p class="text-stone-500 dark:text-stone-400 text-xs font-light mb-4">Пожалуйста, проверьте подключение файла names.json</p>
-                        <button onclick="location.reload()" class="text-xs px-5 py-2.5 bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 rounded-xl hover:bg-stone-700 dark:hover:bg-white transition-colors">
-                            Обновить страницу
-                        </button>
+            if (currentView === 'grid') {
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
+                card.innerHTML = `
+                    <div class="flex justify-between items-baseline mb-3">
+                        <span class="text-[10px] font-mono opacity-40">${formattedId}</span>
+                        <span class="arabic-text text-2xl text-stone-800 dark:text-stone-200 leading-none">${item.arabic}</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-stone-900 dark:text-stone-100 text-[13px] tracking-tight mb-0.5">${item.translit}</h3>
+                        <p class="text-stone-500 dark:text-stone-400 text-[11px] font-light truncate">${item.translation}</p>
                     </div>
                 `;
+            } else {
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between opacity-0 animate-card";
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-mono opacity-40 w-4">${formattedId}</span>
+                        <div>
+                            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-[13px] inline-block tracking-tight">${item.translit}</h3>
+                            <span class="text-stone-500 dark:text-stone-400 text-[11px] font-light ml-2">— ${item.translation}</span>
+                        </div>
+                    </div>
+                    <span class="arabic-text text-xl text-stone-800 dark:text-stone-200">${item.arabic}</span>
+                `;
             }
+            namesGrid.appendChild(card);
+        });
+    }
+
+    searchInput.addEventListener('input', () => renderCards(getFilteredData()));
+
+    function openFullscreen(id) {
+        const item = namesData.find(n => n.id === id);
+        if (!item) return;
+
+        document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
+        document.getElementById('fsTranslit').innerText = item.translit;
+        document.getElementById('fsTranslation').innerText = item.translation;
+        document.getElementById('fsArabic').innerText = item.arabic;
+        document.getElementById('fsMeaning').innerText = item.meaning;
+
+        const rootBlock = document.getElementById('fsRootBlock');
+        if (item.root_000) {
+            rootBlock.classList.remove('hidden');
+            document.getElementById('fsRoot').innerText = item.root_000;
+        } else {
+            rootBlock.classList.add('hidden');
         }
 
-        loadNamesFromServer();
-    </script>
+        const notesBlock = document.getElementById('fsNotesBlock');
+        if (item.is_core === false) {
+            notesBlock.classList.remove('hidden');
+            document.getElementById('fsNotes').innerText = item.notes || "Это имя не входит в традиционный, наиболее распространенный список 99 имён, однако оно упоминается в Коране или достоверных хадисах.";
+        } else {
+            notesBlock.classList.add('hidden');
+        }
+
+        const quranSection = document.getElementById('fsQuranSection');
+        const quranContainer = document.getElementById('fsQuranContainer');
+        quranContainer.innerHTML = '';
+        if (item.quran_references && item.quran_references.length > 0) {
+            quranSection.classList.remove('hidden');
+            item.quran_references.forEach(ref => {
+                const wrap = ref.link_q ? document.createElement('a') : document.createElement('div');
+                if (ref.link_q) {
+                    wrap.setAttribute('href', ref.link_q);
+                    wrap.setAttribute('target', '_blank');
+                }
+                wrap.className = "block p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3 transition-colors hover:border-stone-300 dark:hover:border-stone-600";
+                wrap.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
+                        <span>Сура ${ref.surah}, Аят ${ref.ayah}</span>
+                        ${ref.link_q ? `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                        </svg>` : ''}
+                    </div>
+                    <div class="arabic-text text-2xl md:text-3xl text-right text-stone-900 dark:text-stone-100 leading-normal select-all">${ref.text_arabic}</div>
+                    <div class="pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                        <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed text-xs">«${ref.text_russian}»</p>
+                    </div>
+                `;
+                quranContainer.appendChild(wrap);
+            });
+        } else {
+            quranSection.classList.add('hidden');
+        }
+
+        const hadithSection = document.getElementById('fsHadithSection');
+        const hadithContainer = document.getElementById('fsHadithContainer');
+        hadithContainer.innerHTML = '';
+        if (item.hadith_references && item.hadith_references.length > 0) {
+            hadithSection.classList.remove('hidden');
+            item.hadith_references.forEach(ref => {
+                const isLinked = ref.link_h && ref.link_h.trim() !== '';
+                const wrap = document.createElement(isLinked ? 'a' : 'div');
+                if (isLinked) {
+                    wrap.setAttribute('href', ref.link_h);
+                    wrap.setAttribute('target', '_blank');
+                }
+                wrap.className = "block p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3 transition-colors" + (isLinked ? " hover:border-stone-300 dark:hover:border-stone-600" : "");
+                wrap.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
+                        <span>${ref.collection} ${ref.number ? `№${ref.number}` : ''} ${ref.narrator ? `• ${ref.narrator}` : ''}</span>
+                        ${isLinked ? `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                        </svg>` : ''}
+                    </div>
+                    ${ref.text_arabic ? `<div class="arabic-text text-2xl md:text-3xl text-right text-stone-900 dark:text-stone-100 leading-normal select-all">${ref.text_arabic}</div>` : ''}
+                    <div class="pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                        <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed text-xs">«${ref.text_russian}»</p>
+                    </div>
+                `;
+                hadithContainer.appendChild(wrap);
+            });
+        } else {
+            hadithSection.classList.add('hidden');
+        }
+
+        const duaSection = document.getElementById('fsDuaSection');
+        const duaContainer = document.getElementById('fsDuaContainer');
+        duaContainer.innerHTML = '';
+        if (item.duas && item.duas.length > 0) {
+            duaSection.classList.remove('hidden');
+            item.duas.forEach(dua => {
+                const wrap = document.createElement('div');
+                wrap.className = "p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3";
+                wrap.innerHTML = `
+                    <div class="arabic-text text-2xl md:text-3xl text-stone-900 dark:text-stone-100 text-right leading-normal select-all">${dua.arabic}</div>
+                    <div class="space-y-1.5 pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                        ${dua.translit ? `<div><p class="text-stone-800 dark:text-stone-200 text-xs font-medium">${dua.translit}</p></div>` : ''}
+                        <div><p class="text-stone-500 dark:text-stone-400 text-xs font-light leading-relaxed">${dua.translation}</p></div>
+                    </div>
+                `;
+                duaContainer.appendChild(wrap);
+            });
+        } else {
+            duaSection.classList.add('hidden');
+        }
+
+        fullscreenPage.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            fullscreenPage.classList.remove('opacity-0');
+        });
+        fullscreenPage.scrollTo({ top: 0 });
+    }
+
+    function closeFullscreen() {
+        fullscreenPage.classList.add('opacity-0');
+        setTimeout(() => fullscreenPage.classList.add('hidden'), 300);
+    }
+
+    async function loadNamesFromServer() {
+        try {
+            const response = await fetch('names.json');
+            if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+            namesData = await response.json();
+            renderCards(namesData);
+        } catch (error) {
+            console.error(error);
+            namesGrid.innerHTML = '';
+            namesGrid.className = "flex justify-center items-center h-48 w-full col-span-full transition-all duration-300";
+            namesGrid.innerHTML = `
+                <div class="text-center p-6 bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl max-w-sm w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mx-auto text-stone-400 mb-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="text-stone-800 dark:text-stone-200 text-sm font-medium mb-1">Не удалось загрузить данные</p>
+                    <p class="text-stone-500 dark:text-stone-400 text-xs font-light mb-4">Пожалуйста, проверьте подключение файла names.json</p>
+                    <button onclick="location.reload()" class="text-xs px-5 py-2.5 bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 rounded-xl hover:bg-stone-700 dark:hover:bg-white transition-colors">
+                        Обновить страницу
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    loadNamesFromServer();
+</script>
 </body>
 </html>
