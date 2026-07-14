@@ -51,7 +51,11 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
+        /* Уменьшенный арабский текст для ID 84 и 85 */
+        [data-card-id="84"] .arabic-text,
+        [data-card-id="85"] .arabic-text {
+        font-size: 1.25rem !important;
+        }
         /* Металлическая обводка кнопок */
         .metal-stop-0 { stop-color: #000000; stop-opacity: 0.18; }
         .metal-stop-25 { stop-color: #000000; stop-opacity: 0.05; }
@@ -290,6 +294,7 @@
             data.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.setAttribute('onclick', `openFullscreen(${item.id})`);
+                card.setAttribute('data-card-id', item.id);
                 card.style.animationDelay = `${index * 15}ms`;
 
                 const formattedId = item.id < 10 ? `0${item.id}` : item.id;
