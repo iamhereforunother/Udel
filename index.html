@@ -225,7 +225,12 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+        const isDarkNow = document.documentElement.classList.contains('dark');
+        themeColorMeta.setAttribute('content', isDarkNow ? '#0d0e0d' : '#f9f9f6');
     }
+}
     initTheme();
 
     function toggleTheme() {
