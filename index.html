@@ -13,6 +13,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300..900&family=Scheherazade+New:wght@400;700&family=Wix+Madefor+Display:wght@800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        html {
+            background-color: #f9f9f6
+        }
+        html.dark {
+            background-color: #0d0e0d
+        }
         body {
             font-family: 'Nunito Sans', sans-serif;
             background-color: #f9f9f6;
@@ -21,8 +27,8 @@
             -webkit-tap-highlight-color: transparent;
         }
         .dark body {
-    background-color: #0d0e0d; /* тёмная тема */
-}
+    background-color: #0d0e0d; /* для где зарядка сверху */
+        }
         .arabic-text {
             font-family: 'Scheherazade New', serif;
             line-height: 3;
@@ -199,15 +205,14 @@
                     <div id="fsDuaContainer" class="space-y-3"></div>
                 </div>
 
-                <div id="fsShahadaSection" class="pt-8 mt-8 border-t-0 hidden text-center">
+                             <div id="fsShahadaSection" class="pt-8 mt-8 border-t-0 hidden text-center">
                     <h2 class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-6">Шахада</h2>
                     <div id="fsShahadaContainer" class="flex flex-col gap-8"></div>
                 </div>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
+            </div> <!-- Закрывает внутренний контейнер с контентом -->
+        </div> <!-- Закрывает центровщик max-w-3xl -->
+    </div> <!-- Закрывает сам fullscreenPage -->
+
 
 <script>
     let namesData = [];
@@ -218,18 +223,18 @@
     const fullscreenPage = document.getElementById('fullscreenPage');
     
 function updateThemeColor(color) {
-    let meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-        meta.setAttribute('content', color);
-        // Принудительно обновляем мета-тег в DOM → Safari сразу реагирует
-        meta.parentNode.replaceChild(meta, meta);
-    } else {
+    setTimeout(() => {
+        let meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+            meta.remove();
+        }
         meta = document.createElement('meta');
         meta.name = 'theme-color';
         meta.content = color;
         document.head.appendChild(meta);
-    }
+    }, 50);
 }
+
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
