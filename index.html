@@ -40,8 +40,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-card {
-            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            /* Заменили forwards на both */
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+
         input, textarea {
             font-size: 16px;
         }
@@ -350,10 +352,12 @@ function toggleTheme() {
             const formattedId = item.id < 10 ? `0${item.id}` : item.id;
 
             if (currentView === 'grid') {
-                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
+                // Убрали opacity-0 в самом конце строки
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between animate-card";
                 card.innerHTML = `
                     <div class="flex justify-between items-baseline mb-3">
-                        <span class="text-[10px] font-mono opacity-40">${formattedId}</span>
+                        <!-- Заменили opacity-40 на конкретные цвета текста -->
+                        <span class="text-[10px] font-mono text-stone-400 dark:text-stone-600">${formattedId}</span>
                         <span class="arabic-text text-2xl text-stone-800 dark:text-stone-200 leading-none">${item.arabic}</span>
                     </div>
                     <div>
@@ -362,10 +366,12 @@ function toggleTheme() {
                     </div>
                 `;
             } else {
-                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between opacity-0 animate-card";
+                // Тоже убрали opacity-0
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between animate-card";
                 card.innerHTML = `
                     <div class="flex items-center gap-4">
-                        <span class="text-[10px] font-mono opacity-40 w-4">${formattedId}</span>
+                        <!-- Заменили opacity-40 на конкретные цвета текста -->
+                        <span class="text-[10px] font-mono text-stone-400 dark:text-stone-600 w-4">${formattedId}</span>
                         <div>
                             <h3 class="font-bold text-stone-900 dark:text-stone-100 text-[13px] inline-block tracking-tight">${item.translit}</h3>
                             <span class="text-stone-500 dark:text-stone-400 text-[11px] font-light ml-2">— ${item.translation}</span>
@@ -380,8 +386,8 @@ function toggleTheme() {
 
     searchInput.addEventListener('input', () => renderCards(getFilteredData()));
 
-    function openFullscreen(id) {
-        const item = namesData.find(n => n.id === id);
+  function openFullscreen(id) {
+        const item = namesData.find(n => Number(n.id) === Number(id));
         if (!item) return;
 
         document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
@@ -551,9 +557,13 @@ const shahadaSection = document.getElementById('fsShahadaSection');
         }
 
 fullscreenPage.classList.remove('hidden');
-fullscreenPage.offsetHeight; // Магическая строчка, которая заставит браузер мгновенно просчитать геометрию
-fullscreenPage.classList.remove('opacity-0');
-fullscreenPage.scrollTo({ top: 0 });
+fullscreenPage.classList.remove('hidden');
+        fullscreenPage.scrollTo({ top: 0 });
+        
+        // Даем браузеру 10мс на отрисовку display: block перед анимацией прозрачности
+        setTimeout(() => {
+            fullscreenPage.classList.remove('opacity-0');
+        }, 10);
     }
 
     function closeFullscreen() {
