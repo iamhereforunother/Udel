@@ -382,7 +382,15 @@ function toggleTheme() {
         document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
         document.getElementById('fsTranslit').innerText = item.translit;
         document.getElementById('fsTranslation').innerText = item.translation;
-        document.getElementById('fsArabic').innerText = item.arabic;
+                const fsArabicEl = document.getElementById('fsArabic');
+        if (item.id === 85) {
+            // Для 85-го ID вставляем SVG-картинку с адаптивными размерами
+            fsArabicEl.innerHTML = `<img src="85.svg" class="h-14 md:h-20 max-w-[160px] md:max-w-[240px] w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
+        } else {
+            // Для всех остальных имен оставляем стандартный арабский текст
+            fsArabicEl.innerText = item.arabic;
+        }
+
         document.getElementById('fsMeaning').innerText = item.meaning;
 
         const rootBlock = document.getElementById('fsRootBlock');
