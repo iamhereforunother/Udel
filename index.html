@@ -550,12 +550,11 @@ const shahadaSection = document.getElementById('fsShahadaSection');
             duaSection.classList.add('hidden');
         }
 
-        fullscreenPage.classList.remove('hidden');
-        requestAnimationFrame(() => {
-            fullscreenPage.classList.remove('opacity-0');
-        });
-        fullscreenPage.scrollTo({ top: 0 });
-    }
+fullscreenPage.classList.remove('hidden');
+fullscreenPage.offsetHeight; // Магическая строчка, которая заставит браузер мгновенно просчитать геометрию
+fullscreenPage.classList.remove('opacity-0');
+fullscreenPage.scrollTo({ top: 0 });
+
 
     function closeFullscreen() {
         fullscreenPage.classList.add('opacity-0');
