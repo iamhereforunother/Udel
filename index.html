@@ -353,7 +353,7 @@ function toggleTheme() {
             const formattedId = item.id < 10 ? `0${item.id}` : item.id;
 
             if (currentView === 'grid') {
-                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-2xl p-4 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex flex-col justify-between opacity-0 animate-card";
                 card.innerHTML = `
                     <div class="flex justify-between items-baseline mb-3">
                         <span class="text-[10px] font-mono opacity-40">${formattedId}</span>
@@ -365,7 +365,7 @@ function toggleTheme() {
                     </div>
                 `;
             } else {
-                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between opacity-0 animate-card";
+                card.className = "bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/50 dark:border-stone-800/60 rounded-xl px-5 py-3.5 md:hover:border-stone-300 dark:md:hover:border-stone-600 transition-all duration-300 cursor-pointer flex items-center justify-between opacity-0 animate-card";
                 card.innerHTML = `
                     <div class="flex items-center gap-4">
                         <span class="text-[10px] font-mono opacity-40 w-4">${formattedId}</span>
@@ -398,7 +398,7 @@ function toggleTheme() {
             parentHeader.classList.replace('items-end', 'items-center');
             
             // 2. Увеличиваем размер (до h-20 на мобильных и h-32 на десктопах), чтобы читались детали
-            fsArabicEl.innerHTML = `<img src="85.svg" class="h-20 sm:h-24 md:h-32 w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
+            fsArabicEl.innerHTML = `<img src="85.svg" class="h-32 sm:h-40 md:h-56 w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
         } else {
             // Возвращаем стандартное выравнивание по базовой линии для обычного линейного текста
             parentHeader.classList.replace('items-center', 'items-end');
