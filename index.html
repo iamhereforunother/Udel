@@ -216,31 +216,38 @@
     const searchInput = document.getElementById('searchInput');
     const notFound = document.getElementById('notFound');
     const fullscreenPage = document.getElementById('fullscreenPage');
-
-    function initTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) {
-        const isDarkNow = document.documentElement.classList.contains('dark');
-        themeColorMeta.setAttribute('content', isDarkNow ? '#0d0e0d' : '#f9f9f6');
+    
+function updateThemeColor(color) {
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+        meta.setAttribute('content', color);
+        // Принудительно обновляем мета-тег в DOM → Safari сразу реагирует
+        meta.parentNode.replaceChild(meta, meta);
+    } else {
+        meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = color;
+        document.head.appendChild(meta);
     }
+}
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    const isDarkNow = document.documentElement.classList.contains('dark');
+    updateThemeColor(isDarkNow ? '#0d0e0d' : '#f9f9f6');
 }
     initTheme();
 
-    function toggleTheme() {
-        document.documentElement.classList.toggle('dark');
-        const isDark = document.documentElement.classList.contains('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) {
-        themeColorMeta.setAttribute('content', isDark ? '#0d0e0d' : '#f9f9f6');
-    }
+function toggleTheme() {
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    updateThemeColor(isDark ? '#0d0e0d' : '#f9f9f6');
 }
     
     function toggleView() {
