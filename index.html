@@ -224,19 +224,18 @@
     const fullscreenPage = document.getElementById('fullscreenPage');
     
 function updateThemeColor(color) {
-    // Ищем уже существующий тег
     let meta = document.querySelector('meta[name="theme-color"]');
-    
-    // Если вдруг не нашли (на старте), создаем один раз
     if (!meta) {
         meta = document.createElement('meta');
         meta.name = 'theme-color';
         document.head.appendChild(meta);
     }
-    
-    // Просто меняем цвет, ничего не удаляя. iOS это увидит сразу!
     meta.setAttribute('content', color);
+
+    // ХАК ИЗ ФОРУМОВ: заставляем WebKit проснуться
+    void document.documentElement.offsetHeight; 
 }
+
 
 
 function initTheme() {
