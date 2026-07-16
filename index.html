@@ -231,9 +231,6 @@ function updateThemeColor(color) {
         document.head.appendChild(meta);
     }
     meta.setAttribute('content', color);
-
-    // ХАК ИЗ ФОРУМОВ: заставляем WebKit проснуться
-    void document.documentElement.offsetHeight; 
 }
 
 
