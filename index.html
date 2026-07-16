@@ -382,12 +382,18 @@ function toggleTheme() {
         document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
         document.getElementById('fsTranslit').innerText = item.translit;
         document.getElementById('fsTranslation').innerText = item.translation;
-                const fsArabicEl = document.getElementById('fsArabic');
+                        const fsArabicEl = document.getElementById('fsArabic');
+        const parentHeader = fsArabicEl.parentElement; // Находим flex-контейнер шапки
+
         if (item.id === 85) {
-            // Для 85-го ID вставляем SVG-картинку с адаптивными размерами
-            fsArabicEl.innerHTML = `<img src="85.svg" class="h-14 md:h-20 max-w-[160px] md:max-w-[240px] w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
+            // 1. Центрируем круглую каллиграфию по вертикали относительно длинного текста
+            parentHeader.classList.replace('items-end', 'items-center');
+            
+            // 2. Увеличиваем размер (до h-20 на мобильных и h-32 на десктопах), чтобы читались детали
+            fsArabicEl.innerHTML = `<img src="85.svg" class="h-20 sm:h-24 md:h-32 w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
         } else {
-            // Для всех остальных имен оставляем стандартный арабский текст
+            // Возвращаем стандартное выравнивание по базовой линии для обычного линейного текста
+            parentHeader.classList.replace('items-center', 'items-end');
             fsArabicEl.innerText = item.arabic;
         }
 
