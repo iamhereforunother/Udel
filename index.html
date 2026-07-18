@@ -507,75 +507,53 @@ const shahadaSection = document.getElementById('fsShahadaSection');
             });
         } else {
             shahadaSection.classList.add('hidden');
-        }
-        const hadithSection = document.getElementById('fsHadithSection');
-        const hadithContainer = document.getElementById('fsHadithContainer');
-        hadithContainer.innerHTML = '';
-        if (item.hadith_references && item.hadith_references.length > 0) {
+        }        if (item.hadith_references && item.hadith_references.length > 0) {
             hadithSection.classList.remove('hidden');
-item.hadith_references.forEach(ref => {
-    // 1. Проверяем: ссылка есть, она не пустая И в ней нет слова "sunna.com"
-    const isLinked = ref.link_h && ref.link_h.trim() !== '' && !ref.link_h.toLowerCase().includes('sunna.com');
-
-    // 2. Создаем 'a' (если ссылка валидна) или обычный 'div' (если это sunna.com или ссылки нет)
-    const refElement = document.createElement(isLinked ? 'a' : 'div');
-    
-    // 3. Если это ссылка, добавляем атрибуты перехода
-    if (isLinked) {
-        refElement.href = ref.link_h;
-        refElement.target = "_blank";
-        refElement.className = "flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 hover:underline"; // твои стили для ссылок
-    } else {
-        refElement.className = "text-sm text-stone-500 dark:text-stone-400"; // твои стили для обычного текста
-    }
-
-    // 4. Наполняем контентом (название источника + иконка стрелочки, если это ссылка)
-    refElement.innerHTML = `
-        <span>${ref.source_h}</span>
-        ${isLinked ? `
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-        ` : ''}
-    `;
-
-    hadithContainer.appendChild(refElement);
-});
-
+            item.hadith_references.forEach(ref => {
+                const isLinked = ref.link_h && ref.link_h.trim() !== '';
+                const wrap = document.createElement(isLinked ? 'a' : 'div');
+                if (isLinked) {
+                    wrap.setAttribute('href', ref.link_h);
+                    wrap.setAttribute('target', '_blank');
+                }
+                wrap.className = "block p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3 transition-colors" + (isLinked ? " hover:border-stone-300 dark:hover:border-stone-600" : "");
+                wrap.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
+                        <span>${ref.collection} ${ref.number ? `№${ref.number}` : ''} ${ref.narrator ? `• ${ref.narrator}` : ''}</span>
+                        ${isLinked ? `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                        </svg>` : ''}
+                    </div>
+                    ${ref.text_arabic ? `<div class="arabic-text text-2xl md:text-3xl text-right text-stone-900 dark:text-stone-100 leading-normal select-all">${ref.text_arabic}</div>` : ''}
+                    <div class="pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                        <p class="text-stone-600 dark:text-stone-400 font-light leading-relaxed text-xs">«${ref.text_russian}»</p>
+                    </div>
+                `;
+                hadithContainer.appendChild(wrap);
+            });
         } else {
+            
             hadithSection.classList.add('hidden');
         }
 
         const duaSection = document.getElementById('fsDuaSection');
-        const duaContainer = document.getElementById('fsDuaContainer');
-        duaContainer.innerHTML = '';
         if (item.duas && item.duas.length > 0) {
             duaSection.classList.remove('hidden');
-item.duas.forEach(dua => {
-    const wrap = document.createElement('div');
-    wrap.className = "mb-6 last:mb-0 p-4 bg-stone-50 dark:bg-stone-800/50 rounded-xl"; // твои стили контейнера
-
-    wrap.innerHTML = `
-        <!-- Проверка заголовка: выводим, только если он есть и он НЕ равен "1" или "2" -->
-        ${dua.title && dua.title !== "1" && dua.title !== "2" ? `
-            <div class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-1">
-                ${dua.title}
-            </div>
-        ` : ''}
-
-        <!-- Арабский текст (уже с новым классом, который настроили в CSS) -->
-        <div class="arabic-text text-2xl md:text-3xl text-stone-900 dark:text-stone-100 text-right leading-normal select-all">
-            ${dua.arabic}
-        </div>
-
-        <!-- Твоя транслитерация и перевод (если есть) -->
-        ${dua.translit ? `<div class="text-sm text-stone-600 dark:text-stone-300 italic mt-2">${dua.translit}</div>` : ''}
-        ${dua.translation ? `<div class="text-sm text-stone-800 dark:text-stone-200 mt-1">${dua.translation}</div>` : ''}
-    `;
-duaContainer.appendChild(wrap);
-});
-
+            item.duas.forEach(dua => {
+                const wrap = document.createElement('div');
+                wrap.className = "p-4 rounded-2xl bg-stone-100/50 dark:bg-[#141614]/50 border border-stone-200/40 dark:border-stone-800/60 space-y-3";
+                wrap.innerHTML = `
+                    <div class="arabic-text text-2xl md:text-3xl text-stone-900 dark:text-stone-100 text-right leading-normal select-all">${dua.arabic}</div>
+                    <div class="space-y-1.5 pt-2.5 border-t border-stone-200/60 dark:border-stone-800/60">
+                        ${dua.translit ? `<div><p class="text-stone-800 dark:text-stone-200 text-xs font-medium">${dua.translit}</p></div>` : ''}
+                        ${dua.translation ? `<div><p class="text-stone-500 dark:text-stone-400 text-xs font-light leading-relaxed">${dua.translation}</p></div>` : ''}
+                    </div>
+                `;
+                duaContainer.appendChild(wrap);
+            });
         } else {
+
             duaSection.classList.add('hidden');
         }
 fullscreenPage.classList.remove('hidden');
