@@ -391,24 +391,21 @@ function toggleTheme() {
 
     searchInput.addEventListener('input', () => renderCards(getFilteredData()));
 
-  function openFullscreen(id) {
+    function openFullscreen(id) {
         const item = namesData.find(n => Number(n.id) === Number(id));
         if (!item) return;
 
         document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
         document.getElementById('fsTranslit').innerText = item.translit;
         document.getElementById('fsTranslation').innerText = item.translation;
-                        const fsArabicEl = document.getElementById('fsArabic');
-        const parentHeader = fsArabicEl.parentElement; // Находим flex-контейнер шапки
+        
+        const fsArabicEl = document.getElementById('fsArabic');
+        const parentHeader = fsArabicEl.parentElement;
 
         if (item.id === 85) {
-            // 1. Центрируем круглую каллиграфию по вертикали относительно длинного текста
             parentHeader.classList.replace('items-end', 'items-center');
-            
-            // 2. Увеличиваем размер (до h-20 на мобильных и h-32 на десктопах), чтобы читались детали
             fsArabicEl.innerHTML = `<img src="85.svg" class="h-32 sm:h-40 md:h-56 w-auto object-contain inline-block dark:invert select-none" alt="Имя 85">`;
         } else {
-            // Возвращаем стандартное выравнивание по базовой линии для обычного линейного текста
             parentHeader.classList.replace('items-center', 'items-end');
             fsArabicEl.innerText = item.arabic;
         }
@@ -461,7 +458,8 @@ function toggleTheme() {
         } else {
             quranSection.classList.add('hidden');
         }
-const shahadaSection = document.getElementById('fsShahadaSection');
+
+        const shahadaSection = document.getElementById('fsShahadaSection');
         const shahadaContainer = document.getElementById('fsShahadaContainer');
         shahadaContainer.innerHTML = '';
         
@@ -469,9 +467,8 @@ const shahadaSection = document.getElementById('fsShahadaSection');
             shahadaSection.classList.remove('hidden');
             item.shahada.forEach(shahada => {
                 const wrap = document.createElement('div');
-                wrap.className = "flex flex-col items-center space-y-5"; // Контейнер без рамок
+                wrap.className = "flex flex-col items-center space-y-5";
                 
-                // SVG разделитель с затуханием по краям
                 const fadeDivider = `
                     <svg class="w-full max-w-xs h-[1px] text-stone-300 dark:text-stone-700" preserveAspectRatio="none" viewBox="0 0 100 1">
                         <defs>
@@ -489,16 +486,13 @@ const shahadaSection = document.getElementById('fsShahadaSection');
                     <div class="arabic-text text-3xl md:text-4xl text-stone-900 dark:text-stone-100 text-center leading-normal select-all">
                         ${shahada.arabic}
                     </div>
-                    
                     ${fadeDivider}
-                    
                     ${shahada.translit ? `
                         <div class="text-stone-800 dark:text-stone-200 text-sm font-medium text-center px-4">
                             ${shahada.translit}
                         </div>
                         ${fadeDivider}
                     ` : ''}
-                    
                     <div class="text-stone-500 dark:text-stone-400 text-sm font-light leading-relaxed text-center px-4 max-w-lg">
                         ${shahada.translation}
                     </div>
@@ -507,7 +501,13 @@ const shahadaSection = document.getElementById('fsShahadaSection');
             });
         } else {
             shahadaSection.classList.add('hidden');
-        }        if (item.hadith_references && item.hadith_references.length > 0) {
+        }
+
+        const hadithSection = document.getElementById('fsHadithSection');
+        const hadithContainer = document.getElementById('fsHadithContainer');
+        hadithContainer.innerHTML = '';
+
+        if (item.hadith_references && item.hadith_references.length > 0) {
             hadithSection.classList.remove('hidden');
             item.hadith_references.forEach(ref => {
                 const isLinked = ref.link_h && ref.link_h.trim() !== '';
@@ -533,11 +533,13 @@ const shahadaSection = document.getElementById('fsShahadaSection');
                 hadithContainer.appendChild(wrap);
             });
         } else {
-            
             hadithSection.classList.add('hidden');
         }
 
         const duaSection = document.getElementById('fsDuaSection');
+        const duaContainer = document.getElementById('fsDuaContainer');
+        duaContainer.innerHTML = '';
+
         if (item.duas && item.duas.length > 0) {
             duaSection.classList.remove('hidden');
             item.duas.forEach(dua => {
@@ -553,17 +555,17 @@ const shahadaSection = document.getElementById('fsShahadaSection');
                 duaContainer.appendChild(wrap);
             });
         } else {
-
             duaSection.classList.add('hidden');
         }
-fullscreenPage.classList.remove('hidden');
+
+        fullscreenPage.classList.remove('hidden');
         fullscreenPage.scrollTo({ top: 0 });
         
-        // Даем браузеру 10мс на отрисовку display: block перед анимацией прозрачности
         setTimeout(() => {
             fullscreenPage.classList.remove('opacity-0');
         }, 10);
     }
+
 
     function closeFullscreen() {
         fullscreenPage.classList.add('opacity-0');
