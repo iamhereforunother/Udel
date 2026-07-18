@@ -510,7 +510,7 @@ function toggleTheme() {
         if (item.hadith_references && item.hadith_references.length > 0) {
             hadithSection.classList.remove('hidden');
             item.hadith_references.forEach(ref => {
-                const isLinked = ref.link_h && ref.link_h.trim() !== '';
+                const isLinked = ref.link_h && ref.link_h.trim() !== '' && !ref.link_h.toLowerCase().includes('sunna.com');
                 const wrap = document.createElement(isLinked ? 'a' : 'div');
                 if (isLinked) {
                     wrap.setAttribute('href', ref.link_h);
