@@ -697,14 +697,15 @@ function toggleTheme() {
     }
 
     loadNamesFromServer();
+    (() => {
 // --- Физика для кнопок (Bubble Effect) ---
-(() => {
+(function() {
   const pressScale    = 1.12;   // Увеличение при простом тапе
   const stretchMax    = 0.02;   // Доп. растяжение при перетаскивании
-  const translateMax  = 0.9;    // Максимальное смещение за пальцем (уменьшено)
-  const dragThreshold = 7;      // Порог в пикселях: меньше — просто тап, больше — перетаскивание
+  const dragThreshold = 7;      // Порог в пикселях: меньше — тап, больше — перетаскивание
   const stiffness     = 0.18;
   const damping       = 0.35;
+  const maxMovePx     = 4;      // Максимальное смещение за пальцем (в пикселях)
 
   const useResizeObserver = 'ResizeObserver' in window;
 
@@ -714,11 +715,14 @@ function toggleTheme() {
     const state  = { sx: 1, sy: 1, tx: 0, ty: 0, vsx: 0, vsy: 0, vtx: 0, vty: 0 };
     const target = { sx: 1, sy: 1, tx: 0, ty: 0 };
 
-    let rect, center;
+    let rect = null;
+    let center = null;
     let pointerDown = false;
     let isDragging  = false;
     let startX = 0, startY = 0;
+    let activePointerId = null;
 
+    // Функция пересчёта геометрии кнопки
     function measure() {
       rect = el.getBoundingClientRect();
       center = {
@@ -727,17 +731,20 @@ function toggleTheme() {
       };
     }
 
-    setTimeout(measure, 100);
+    // Сразу вычисляем размеры, чтобы они были доступны при первом нажатии
+    measure();
 
+    // Наблюдатель за изменением размера (обновляет геометрию)
+    let resizeObserver = null;
     if (useResizeObserver) {
-      const ro = new ResizeObserver(measure);
-      ro.observe(el);
+      resizeObserver = new ResizeObserver(() => measure());
+      resizeObserver.observe(el);
     } else {
       window.addEventListener('resize', measure);
     }
 
-    // Сброс в исходное состояние
-    const reset = () => {
+    // Сброс всех состояний
+    function reset() {
       pointerDown = false;
       isDragging  = false;
       el.classList.remove('show-light');
@@ -745,35 +752,51 @@ function toggleTheme() {
       target.sy = 1;
       target.tx = 0;
       target.ty = 0;
-    };
+      // Сбрасываем блик в центр
+      el.style.setProperty('--lightX', '50%');
+      el.style.setProperty('--lightY', '50%');
 
-    // Сброс при любом «срыве» захвата — больше никаких зависаний
+      if (activePointerId !== null) {
+        try {
+          el.releasePointerCapture(activePointerId);
+        } catch (_) {}
+        activePointerId = null;
+      }
+    }
+
+    // События, которые гарантированно сбрасывают состояние
     el.addEventListener('lostpointercapture', reset);
     el.addEventListener('pointerup',   reset);
     el.addEventListener('pointercancel', reset);
 
+    // Нажатие пальцем/мышью
     el.addEventListener('pointerdown', (e) => {
+      // Если геометрия по какой-то причине не определена – пересчитаем
+      if (!rect || !center) measure();
+
       pointerDown = true;
       isDragging  = false;
       startX = e.clientX;
       startY = e.clientY;
+      activePointerId = e.pointerId;
 
       el.setPointerCapture(e.pointerId);
       el.classList.add('show-light');
 
-      // При простом касании только увеличиваем, без смещения
+      // При касании просто увеличиваем, смещения нет
       target.sx = pressScale;
       target.sy = pressScale;
       target.tx = 0;
       target.ty = 0;
 
-      // Блик ставим по точке касания относительно центра
+      // Блик по точке касания
       const nx = (e.clientX - center.x) / (rect.width / 2);
       const ny = (e.clientY - center.y) / (rect.height / 2);
       el.style.setProperty('--lightX', `${50 + nx * 30}%`);
       el.style.setProperty('--lightY', `${50 + ny * 30}%`);
     });
 
+    // Движение пальца/мыши
     el.addEventListener('pointermove', (e) => {
       if (!pointerDown) return;
 
@@ -781,35 +804,43 @@ function toggleTheme() {
       const dy = e.clientY - startY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      // Переходим в режим перетаскивания только после превышения порога
+      // Переход в режим перетаскивания после превышения порога
       if (!isDragging && dist > dragThreshold) {
         isDragging = true;
       }
+
+      // Обновляем геометрию (на случай, если размер кнопки изменился)
+      measure();
 
       const nx = (e.clientX - center.x) / (rect.width / 2);
       const ny = (e.clientY - center.y) / (rect.height / 2);
 
       if (isDragging) {
-        // В режиме перетаскивания даём лёгкое смещение и растяжение
+        // Растяжение в сторону движения
         target.sx = pressScale + Math.abs(nx) * stretchMax;
         target.sy = pressScale + Math.abs(ny) * stretchMax;
-        target.tx = nx * translateMax;
-        target.ty = ny * translateMax;
+
+        // Смещение, ограниченное maxMovePx пикселями
+        const rawTx = nx * (rect.width / 2);
+        const rawTy = ny * (rect.height / 2);
+        target.tx = Math.max(-maxMovePx, Math.min(maxMovePx, rawTx));
+        target.ty = Math.max(-maxMovePx, Math.min(maxMovePx, rawTy));
       } else {
-        // Пока палец почти не двигается — просто держим увеличенный масштаб без искажений
+        // Пока палец почти не двигается – держим увеличение без искажений
         target.sx = pressScale;
         target.sy = pressScale;
         target.tx = 0;
         target.ty = 0;
       }
 
-      // Блик следует за пальцем только в режиме перетаскивания (либо всегда, если хочется)
+      // Блик следует за пальцем всегда
       const lightX = 50 + nx * 30;
       const lightY = 50 + ny * 30;
       el.style.setProperty('--lightX', `${lightX}%`);
       el.style.setProperty('--lightY', `${lightY}%`);
     });
 
+    // Анимационный цикл (физика с инерцией)
     function loop() {
       state.vsx = (state.vsx + (target.sx - state.sx) * stiffness) * (1 - damping);
       state.sx += state.vsx;
@@ -823,14 +854,15 @@ function toggleTheme() {
       state.vty = (state.vty + (target.ty - state.ty) * stiffness) * (1 - damping);
       state.ty += state.vty;
 
-      el.style.transform = `translate(${state.tx.toFixed(3)}px, ${state.ty.toFixed(3)}px) scale(${state.sx.toFixed(4)}, ${state.sy.toFixed(4)})`;
+      el.style.transform =
+        `translate(${state.tx.toFixed(3)}px, ${state.ty.toFixed(3)}px) ` +
+        `scale(${state.sx.toFixed(4)}, ${state.sy.toFixed(4)})`;
 
       requestAnimationFrame(loop);
     }
     loop();
   }
 })();
-
 </script>
 </body>
 </html>
