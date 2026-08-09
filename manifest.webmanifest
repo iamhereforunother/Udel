@@ -1,0 +1,14 @@
+{
+  "name": "99 имён Аллаха",
+  "short_name": "Udel",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "Udel/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
