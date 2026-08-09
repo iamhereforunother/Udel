@@ -697,23 +697,24 @@ function toggleTheme() {
     }
 
     loadNamesFromServer();
-    // --- Физика для кнопок (Bubble Effect) ---
+// --- Физика для кнопок (Bubble Effect с защитой от ложных срабатываний) ---
 (() => {
-  const pressScale   = 1.15;  // Насколько увеличивается при нажатии (чуть уменьшил для аккуратности)
-  const stretchMax   = 0.03;  // Максимальное растяжение в стороны
-  const translateMax = 2.0;   // Смещение за пальцем/курсором
-  const stiffness    = 0.15;  // Жесткость пружины
-  const damping      = 0.28;  // Затухание пружины
+  const pressScale   = 1.12;  // Аккуратное увеличение
+  const stretchMax   = 0.02;  // Минимальное дополнительное растяжение
+  const translateMax = 0.8;   // Сильно уменьшили смещение за пальцем, чтобы никуда не «улетало»
+  const stiffness    = 0.18;  // Чуть быстрее возвращается пружина
+  const damping      = 0.25;
 
   const useResizeObserver = 'ResizeObserver' in window;
   
-  // Ищем все кнопки с классом bubble
   document.querySelectorAll('.bubble').forEach(setupBubble);
 
   function setupBubble(el) {
     const state  = { sx: 1, sy: 1, tx: 0, ty: 0, vsx: 0, vsy: 0, vtx: 0, vty: 0 };
     const target = { sx: 1, sy: 1, tx: 0, ty: 0 };
     let rect, center, down = false;
+    let startX = 0, startY = 0;
+    let isDragging = false; // Флаг: реально ли начали тянуть, а не просто нажали
 
     function measure() {
       rect = el.getBoundingClientRect();
@@ -723,7 +724,6 @@ function toggleTheme() {
       };
     }
     
-    // Замеряем позицию с небольшой задержкой, чтобы DOM точно отрисовался
     setTimeout(measure, 100);
 
     if (useResizeObserver) {
@@ -735,47 +735,76 @@ function toggleTheme() {
 
     el.addEventListener('pointerdown', (e) => {
       down = true;
+      isDragging = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      
       el.setPointerCapture(e.pointerId);
       el.classList.add('show-light');
+      
+      // При простом клике — только легкое увеличение, без перекосов
       target.sx = pressScale;
       target.sy = pressScale;
-      move(e);
+      target.tx = 0;
+      target.ty = 0;
     });
 
     el.addEventListener('pointermove', (e) => {
       if (!down) return;
-      move(e);
+
+      // Считаем, на сколько сместился палец с момента касания
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // «Мертвая зона» (5 пикселей): если палец шевельнулся меньше чем на 5px, 
+انيا      // мы считаем это обычным кликом и не включаем физику растяжения вбок.
+      if (distance > 5) {
+        isDragging = true;
+        move(e);
+      }
     });
 
-    const up = () => {
+    const up = (e) => {
+      if (!down) return;
       down = false;
+      isDragging = false;
+      
       el.classList.remove('show-light');
+      
+      // Возвращаем в исходное состояние
       target.sx = 1;
       target.sy = 1;
       target.tx = 0;
       target.ty = 0;
+
+      // Если это был просто клик (без перетаскивания), убедимся, 
+      // что браузер гарантированно выполнит стандартный onclick кнопки
+      if (e && e.type === 'pointerup') {
+        // события клика сработают сами, если не было preventDefault
+      }
     };
     
     el.addEventListener('pointerup', up);
     el.addEventListener('pointercancel', up);
-    // Использован blur на window, чтобы не "залипало" при свайпах iOS
-    window.addEventListener('blur', up); 
+    window.addEventListener('blur', up);
 
     function move(e) {
       const nx = (e.clientX - center.x) / (rect.width / 2);
       const ny = (e.clientY - center.y) / (rect.height / 2);
 
-      // Рассчет растяжения
-      target.sx = pressScale + Math.abs(nx) * stretchMax;
-      target.sy = pressScale + Math.abs(ny) * stretchMax;
+      // Плавное ограничение коэффициентов, чтобы кнопка не «рвалась»
+      const clampedNx = Math.max(-1.5, Math.min(1.5, nx));
+      const clampedNy = Math.max(-1.5, Math.min(1.5, ny));
 
-      // Рассчет смещения
-      target.tx = nx * translateMax;
-      target.ty = ny * translateMax;
+      target.sx = pressScale + Math.abs(clampedNx) * stretchMax;
+      target.sy = pressScale + Math.abs(clampedNy) * stretchMax;
 
-      // Позиция светового блика
-      const lightX = 50 + nx * 30;
-      const lightY = 50 + ny * 30;
+      target.tx = clampedNx * translateMax;
+      target.ty = clampedNy * translateMax;
+
+      const lightX = 50 + clampedNx * 20;
+      const lightY = 50 + clampedNy * 20;
       el.style.setProperty('--lightX', `${lightX}%`);
       el.style.setProperty('--lightY', `${lightY}%`);
     }
@@ -793,7 +822,7 @@ function toggleTheme() {
       state.vty = (state.vty + (target.ty - state.ty) * stiffness) * (1 - damping);
       state.ty += state.vty;
 
-      // Применяем трансформацию ко всей кнопке
+      // Применяем трансформацию. Округление до 4 знаков спасает от багов рендеринга Safari.
       el.style.transform = `translate(${state.tx.toFixed(3)}px, ${state.ty.toFixed(3)}px) scale(${state.sx.toFixed(4)}, ${state.sy.toFixed(4)})`;
 
       requestAnimationFrame(loop);
@@ -801,6 +830,7 @@ function toggleTheme() {
     loop();
   }
 })();
+
 </script>
 </body>
 </html>
