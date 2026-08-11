@@ -66,13 +66,13 @@
     background-color: #0d0e0d; /* для где зарядка сверху */
         }
         #searchInput::placeholder {
-    color: #9ca3af;  /* Измените цвет на свой */
+    color: #a5a5a5;  /* Измените цвет на свой */
     font-size: 0.75rem;  /* Уменьшить размер шрифта */
     opacity: 0.7;  /* Прозрачность */
 }
 
 .dark #searchInput::placeholder {
-    color: #6b7280;  /* Цвет для тёмной темы */
+    color: #737373;  /* Цвет для тёмной темы */
 }
 .arabic-text {
     font-family: 'Uthman Hafs', 'Scheherazade New', serif;
@@ -425,13 +425,14 @@ function toggleTheme() {
         return tmp[a.length][b.length];
     }
 
-    // Вспомогательная функция для удаления апострофов, кавычек и дефисов/тире
-    function normalizeString(str) {
-        if (!str) return '';
-        return str
-            .toLowerCase()
-            // Удаляет: ' ` ’ ‘ “ ” ´ ʻ ʼ " - – —
-            .replace(/['\`‘’“”´ʻʼ\"\-–—]/g, '');
+function normalizeString(str) {
+    if (!str) return '';
+    return str
+        .toLowerCase()
+        // Удаляем знаки препинания и кавычки
+        .replace(/['\`‘’“”´ʻʼ\"\-–—]/g, '')
+        // Удаляем арабские огласовки (харакаты)
+        .replace(/[\u064B-\u065F\u0670]/g, '');
     }
 
     function checkWordMatch(queryWord, targetText) {
@@ -468,7 +469,7 @@ function toggleTheme() {
                     checkWordMatch(word, item.translit) ||
                     checkWordMatch(word, item.translation) ||
                     checkWordMatch(word, item.meaning) ||
-                    item.arabic.includes(word)
+                    normalizeString(item.arabic).includes(word)
                 );
             });
         });
@@ -529,6 +530,9 @@ function toggleTheme() {
         const item = namesData.find(n => Number(n.id) === Number(id));
         if (!item) return;
 
+        document.body.classList.add('is-locked');
+
+        
         document.getElementById('fsId').innerText = item.id < 10 ? `0${item.id}` : item.id;
         document.getElementById('fsTranslit').innerText = item.translit;
         document.getElementById('fsTranslation').innerText = item.translation;
@@ -704,9 +708,11 @@ function toggleTheme() {
 
 
     function closeFullscreen() {
-        fullscreenPage.classList.add('opacity-0');
-        setTimeout(() => fullscreenPage.classList.add('hidden'), 300);
+    fullscreenPage.classList.add('opacity-0');
+    document.body.classList.remove('is-locked'); // <-- Добавить эту строку
+    setTimeout(() => fullscreenPage.classList.add('hidden'), 300);
     }
+
 
     async function loadNamesFromServer() {
         try {
@@ -750,7 +756,9 @@ async function openModalFromJSON(fileUrl) {
         document.getElementById('fsTranslit').innerText = data.title || '';
         document.getElementById('fsTranslation').innerText = data.subtitle || '';
         document.getElementById('fsMeaning').innerHTML = data.content || '';
-document.body.classList.add('overflow-hidden');
+        
+        
+        document.body.classList.add('is-locked');
         
         // Очищаем/скрываем элементы, специфичные для карточек имён
         document.getElementById('fsArabic').innerText = '';
@@ -758,6 +766,11 @@ document.body.classList.add('overflow-hidden');
         document.getElementById('fsHadithSection').classList.add('hidden');
         document.getElementById('fsDuaSection').classList.add('hidden');
         document.getElementById('fsShahadaSection').classList.add('hidden');
+
+        // Сбрасываем и скрываем блоки особенностей, заметок и ID от прошлых карточек
+        document.getElementById('fsId').innerText = '';
+        document.getElementById('fsRootBlock').classList.add('hidden');
+        document.getElementById('fsNotesBlock').classList.add('hidden');
 
         // Показываем полноэкранное окно
         fullscreenPage.classList.remove('hidden');
@@ -912,7 +925,15 @@ loadNamesFromServer();
       el.style.setProperty('--lightY', `${lightY}%`);
     });
 
-    // Анимационный цикл (физика с инерцией)
+    let isRunning = false;
+
+    function startLoop() {
+      if (!isRunning) {
+        isRunning = true;
+        loop();
+      }
+    }
+
     function loop() {
       state.vsx = (state.vsx + (target.sx - state.sx) * stiffness) * (1 - damping);
       state.sx += state.vsx;
@@ -930,9 +951,28 @@ loadNamesFromServer();
         `translate(${state.tx.toFixed(3)}px, ${state.ty.toFixed(3)}px) ` +
         `scale(${state.sx.toFixed(4)}, ${state.sy.toFixed(4)})`;
 
+      // Разница между текущим и целевым состоянием
+      const delta = Math.abs(target.sx - state.sx) + 
+                    Math.abs(target.sy - state.sy) + 
+                    Math.abs(target.tx - state.tx) + 
+                    Math.abs(target.ty - state.ty) + 
+                    Math.abs(state.vsx) + Math.abs(state.vsy);
+
+      // Если палец отпущен и анимация остановилась — выключаем цикл
+      if (!pointerDown && delta < 0.0001) {
+        isRunning = false;
+        return; 
+      }
+
       requestAnimationFrame(loop);
     }
-    loop();
+
+    // Запускаем цикл только при взаимодействии
+    el.addEventListener('pointerdown', startLoop);
+    el.addEventListener('pointermove', () => {
+      if (pointerDown) startLoop();
+    });
+
   }
 })();
 </script>
