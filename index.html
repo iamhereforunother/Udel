@@ -190,6 +190,12 @@ html.dark .bubble::after {
 .bubble.show-light::after {
     opacity: 1;
 }
+        body.is-locked {
+  overflow: hidden;
+  /* Для iOS Safari: запрещает передачу скролла фоновому элементу */
+  overscroll-behavior: contain; 
+}
+
     </style>
 </head>
     
@@ -235,7 +241,7 @@ html.dark .bubble::after {
     
     <div class="fixed top-3 left-3 z-50 flex gap-2">
         <!-- ИНФО кнопка -->
-    <button onclick="bubble relative p-2.5 rounded-full bg-stone-100/70 dark:bg-[#141614]/70 backdrop-blur-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-300">
+    <button onclick="openModalFromJSON('info.json')" class="bubble relative p-2.5 rounded-full bg-stone-100/70 dark:bg-[#141614]/70 backdrop-blur-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-300">
         <!-- Металлическое кольцо -->
         <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" fill="none">
             <circle cx="50" cy="50" r="49" stroke="url(#metal-ring)" stroke-width="2.2" />
@@ -247,7 +253,7 @@ html.dark .bubble::after {
     </button>
     
     <!-- АРАБ кнопка -->
-    <button onclick="bubble relative p-2.5 rounded-full bg-stone-100/70 dark:bg-[#141614]/70 backdrop-blur-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-300">
+    <button onclick="openModalFromJSON('arabian.json')" class="bubble relative p-2.5 rounded-full bg-stone-100/70 dark:bg-[#141614]/70 backdrop-blur-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors duration-300">
 
         <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" fill="none">
             <circle cx="50" cy="50" r="49" stroke="url(#metal-ring)" stroke-width="2.2" />
@@ -727,7 +733,43 @@ function toggleTheme() {
         }
     }
 
-    loadNamesFromServer();
+    const modalCache = {};
+
+async function openModalFromJSON(fileUrl) {
+    try {
+        // Подгружаем файл только если его еще нет в кэше
+        if (!modalCache[fileUrl]) {
+            const response = await fetch(fileUrl);
+            if (!response.ok) throw new Error(`Не удалось загрузить ${fileUrl}`);
+            modalCache[fileUrl] = await response.json();
+        }
+
+        const data = modalCache[fileUrl];
+
+        // Заполняем модальное окно
+        document.getElementById('fsTranslit').innerText = data.title || '';
+        document.getElementById('fsTranslation').innerText = data.subtitle || '';
+        document.getElementById('fsMeaning').innerHTML = data.content || '';
+document.body.classList.add('overflow-hidden');
+        
+        // Очищаем/скрываем элементы, специфичные для карточек имён
+        document.getElementById('fsArabic').innerText = '';
+        document.getElementById('fsQuranSection').classList.add('hidden');
+        document.getElementById('fsHadithSection').classList.add('hidden');
+        document.getElementById('fsDuaSection').classList.add('hidden');
+        document.getElementById('fsShahadaSection').classList.add('hidden');
+
+        // Показываем полноэкранное окно
+        fullscreenPage.classList.remove('hidden');
+        fullscreenPage.scrollTo({ top: 0 });
+        setTimeout(() => fullscreenPage.classList.remove('opacity-0'), 10);
+
+    } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+    }
+}
+loadNamesFromServer();
+    
 // --- Физика для кнопок (Bubble Effect) ---
 (function() {
   const pressScale    = 1.12;   // Увеличение при простом тапе
