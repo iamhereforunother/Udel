@@ -192,10 +192,16 @@ html.dark .bubble::after {
 }
         body.is-locked {
   overflow: hidden;
+height: 100hv;
+            touch-action:none;
   /* Для iOS Safari: запрещает передачу скролла фоновому элементу */
   overscroll-behavior: contain; 
 }
-
+    #fullscreenPage {
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+        
     </style>
 </head>
     
